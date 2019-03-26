@@ -1,0 +1,44 @@
+
+//Austin Zimmers
+//Based on https://www.electroschematics.com/9522/arduino-control-leds-ir-remote/
+
+
+#include <IRremote.h>
+
+int RECV_PIN = 3; // where you connect the output pin of IR reciever module
+int led1 = 2; //pin with LED
+
+int itsONled[] = {0,0};
+
+#define code1  63495 // code received from button A (of an IR remote)
+
+IRrecv irrecv(RECV_PIN);
+
+decode_results results;
+
+void setup()
+{
+  Serial.begin(9600);   
+  irrecv.enableIRIn();  // Start the receiver
+  pinMode(led1, OUTPUT);
+
+}
+
+void loop() {
+  if (irrecv.decode(&results)) {
+    unsigned int value = results.value;
+    switch(value) {
+       case code1:
+         if(itsONled[1] == 1) {        // if led is on;
+            digitalWrite(led1, LOW);   // turn off when button pressed
+            itsONled[1] = 0;           // set state as off
+         } else {                      // else if led is off
+             digitalWrite(led1, HIGH); // turn on when button is pressed
+             itsONled[1] = 1;          // set its state as on
+         }
+          break; 
+    }
+    Serial.println(value); // for testing purposes 
+    irrecv.resume(); // Receive the next value
+  }
+}
